@@ -29,6 +29,15 @@ export type Chamado = {
   atualizado_em: string;
 };
 
+export type NovoChamado = Pick<Chamado, 'titulo' | 'descricao' | 'prioridade'>;
+
+export type Comentario = {
+  id: number;
+  texto: string;
+  autor: UsuarioResumo;
+  criado_em: string;
+};
+
 export type PaginaChamados = {
   itens: Chamado[];
   total: number;
@@ -100,4 +109,28 @@ export function listarChamados(token: string, filtros: FiltrosChamados): Promise
     parametros.set('status', filtros.status);
   }
   return requisitar<PaginaChamados>(`/chamados?${parametros}`, { headers: comToken(token) });
+}
+
+export function criarChamado(token: string, dados: NovoChamado): Promise<Chamado> {
+  return requisitar<Chamado>('/chamados', {
+    method: 'POST',
+    headers: { ...comToken(token), 'Content-Type': 'application/json' },
+    body: JSON.stringify(dados),
+  });
+}
+
+export function buscarChamado(token: string, id: number): Promise<Chamado> {
+  return requisitar<Chamado>(`/chamados/${id}`, { headers: comToken(token) });
+}
+
+export function listarComentarios(token: string, chamadoId: number): Promise<Comentario[]> {
+  return requisitar<Comentario[]>(`/chamados/${chamadoId}/comentarios`, { headers: comToken(token) });
+}
+
+export function comentar(token: string, chamadoId: number, texto: string): Promise<Comentario> {
+  return requisitar<Comentario>(`/chamados/${chamadoId}/comentarios`, {
+    method: 'POST',
+    headers: { ...comToken(token), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ texto }),
+  });
 }

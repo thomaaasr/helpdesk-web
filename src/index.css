@@ -1,5 +1,5 @@
 :root {
-  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  font-family: system-ui, "Segoe UI", Roboto, sans-serif;
   color: #1e293b;
   background: #f8fafc;
 }
@@ -153,11 +153,60 @@ button.link {
   font-size: 1.2em;
 }
 
-.cartao input {
+.cartao input,
+.cartao select,
+.cartao textarea {
   padding: 8px 12px;
   border: 1px solid #cbd5e1;
   border-radius: 6px;
   font: inherit;
+}
+
+button.link.titulo {
+  padding: 0;
+  text-align: left;
+}
+
+.etiquetas {
+  display: flex;
+  gap: 8px;
+}
+
+.descricao {
+  white-space: pre-wrap;
+}
+
+.dados {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 16px;
+}
+
+.dados dt {
+  color: #64748b;
+}
+
+.dados dd {
+  margin: 0;
+}
+
+.comentarios {
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.comentarios li {
+  margin-bottom: 8px;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.comentarios p {
+  margin: 6px 0 0;
+  white-space: pre-wrap;
 }
 
 .acoes {
