@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 import {
   buscarUsuarioLogado,
   ErroApi,
@@ -6,18 +6,18 @@ import {
   type PaginaChamados,
   type StatusChamado,
   type Usuario,
-} from "./api.ts";
-import DetalheChamado from "./DetalheChamado.tsx";
-import { formatarData, NOMES_PRIORIDADE, NOMES_STATUS } from "./formatos.ts";
-import Login from "./Login.tsx";
-import NovoChamado from "./NovoChamado.tsx";
+} from './api.ts';
+import DetalheChamado from './DetalheChamado.tsx';
+import { formatarData, NOMES_PRIORIDADE, NOMES_STATUS } from './formatos.ts';
+import Login from './Login.tsx';
+import NovoChamado from './NovoChamado.tsx';
 
 const ITENS_POR_PAGINA = 10;
 
 // O token fica guardado no navegador para o login sobreviver a um F5.
 function lerTokenSalvo() {
   try {
-    return localStorage.getItem("token");
+    return localStorage.getItem('token');
   } catch {
     return null;
   }
@@ -26,9 +26,9 @@ function lerTokenSalvo() {
 function salvarToken(token: string | null) {
   try {
     if (token) {
-      localStorage.setItem("token", token);
+      localStorage.setItem('token', token);
     } else {
-      localStorage.removeItem("token");
+      localStorage.removeItem('token');
     }
   } catch {
     // Se o navegador bloquear o armazenamento, o login vale só enquanto a página estiver aberta.
@@ -40,7 +40,7 @@ function App() {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [pagina, setPagina] = useState<PaginaChamados | null>(null);
   const [erro, setErro] = useState<string | null>(null);
-  const [status, setStatus] = useState<StatusChamado | "">("");
+  const [status, setStatus] = useState<StatusChamado | ''>('');
   const [numeroPagina, setNumeroPagina] = useState(1);
   const [atrasados, setAtrasados] = useState(false);
   const [abrindoChamado, setAbrindoChamado] = useState(false);
@@ -93,9 +93,7 @@ function App() {
     };
   }, [token, status, atrasados, numeroPagina, versaoLista]);
 
-  const totalPaginas = pagina
-    ? Math.max(1, Math.ceil(pagina.total / pagina.limite))
-    : 1;
+  const totalPaginas = pagina ? Math.max(1, Math.ceil(pagina.total / pagina.limite)) : 1;
 
   return (
     <main>
@@ -104,8 +102,7 @@ function App() {
         {usuario && (
           <div className="usuario">
             <span>
-              {usuario.nome} ·{" "}
-              {usuario.perfil === "tecnico" ? "Técnico" : "Solicitante"}
+              {usuario.nome} · {usuario.perfil === 'tecnico' ? 'Técnico' : 'Solicitante'}
             </span>
             <button onClick={() => trocarToken(null)}>Sair</button>
           </div>
@@ -134,7 +131,7 @@ function App() {
               token={token}
               aoCriar={() => {
                 setAbrindoChamado(false);
-                setStatus("");
+                setStatus('');
                 setNumeroPagina(1);
                 setVersaoLista(versaoLista + 1);
               }}
@@ -145,17 +142,14 @@ function App() {
 
           <div className="filtros">
             {!abrindoChamado && (
-              <button
-                className="principal"
-                onClick={() => setAbrindoChamado(true)}
-              >
+              <button className="principal" onClick={() => setAbrindoChamado(true)}>
                 Abrir chamado
               </button>
             )}
             <select
               value={status}
               onChange={(evento) => {
-                setStatus(evento.target.value as StatusChamado | "");
+                setStatus(evento.target.value as StatusChamado | '');
                 setNumeroPagina(1);
               }}
             >
@@ -178,20 +172,11 @@ function App() {
             </label>
           </div>
 
-          {erro && (
-            <p className="erro">
-              Não foi possível carregar os chamados: {erro}
-            </p>
-          )}
+          {erro && <p className="erro">Não foi possível carregar os chamados: {erro}</p>}
           {!erro && !pagina && (
-            <p>
-              Carregando... No primeiro acesso, a API pode levar cerca de 1
-              minuto para acordar.
-            </p>
+            <p>Carregando... No primeiro acesso, a API pode levar cerca de 1 minuto para acordar.</p>
           )}
-          {pagina && pagina.itens.length === 0 && (
-            <p>Nenhum chamado encontrado.</p>
-          )}
+          {pagina && pagina.itens.length === 0 && <p>Nenhum chamado encontrado.</p>}
 
           {pagina && pagina.itens.length > 0 && (
             <table>
@@ -211,30 +196,21 @@ function App() {
                   <tr key={chamado.id}>
                     <td>{chamado.id}</td>
                     <td>
-                      <button
-                        className="link titulo"
-                        onClick={() => setChamadoAberto(chamado.id)}
-                      >
+                      <button className="link titulo" onClick={() => setChamadoAberto(chamado.id)}>
                         {chamado.titulo}
                       </button>
                     </td>
                     <td>{chamado.solicitante.nome}</td>
-                    <td>{chamado.tecnico?.nome ?? "—"}</td>
+                    <td>{chamado.tecnico?.nome ?? '—'}</td>
                     <td>
-                      <span className={`etiqueta ${chamado.prioridade}`}>
-                        {NOMES_PRIORIDADE[chamado.prioridade]}
-                      </span>
+                      <span className={`etiqueta ${chamado.prioridade}`}>{NOMES_PRIORIDADE[chamado.prioridade]}</span>
                     </td>
                     <td>
-                      <span className={`etiqueta ${chamado.status}`}>
-                        {NOMES_STATUS[chamado.status]}
-                      </span>
+                      <span className={`etiqueta ${chamado.status}`}>{NOMES_STATUS[chamado.status]}</span>
                     </td>
-                    <td
-                      className={chamado.sla_estourado ? "atrasado" : undefined}
-                    >
+                    <td className={chamado.sla_estourado ? 'atrasado' : undefined}>
                       {formatarData(chamado.prazo_em)}
-                      {chamado.sla_estourado && " · fora do prazo"}
+                      {chamado.sla_estourado && ' · fora do prazo'}
                     </td>
                   </tr>
                 ))}
@@ -244,20 +220,13 @@ function App() {
 
           {pagina && pagina.total > 0 && (
             <div className="paginacao">
-              <button
-                disabled={numeroPagina <= 1}
-                onClick={() => setNumeroPagina(numeroPagina - 1)}
-              >
+              <button disabled={numeroPagina <= 1} onClick={() => setNumeroPagina(numeroPagina - 1)}>
                 Anterior
               </button>
               <span>
-                Página {numeroPagina} de {totalPaginas} · {pagina.total}{" "}
-                chamado(s)
+                Página {numeroPagina} de {totalPaginas} · {pagina.total} chamado(s)
               </span>
-              <button
-                disabled={numeroPagina >= totalPaginas}
-                onClick={() => setNumeroPagina(numeroPagina + 1)}
-              >
+              <button disabled={numeroPagina >= totalPaginas} onClick={() => setNumeroPagina(numeroPagina + 1)}>
                 Próxima
               </button>
             </div>
