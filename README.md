@@ -4,6 +4,15 @@
 
 **Demo:** [helpdesk-web-6ae7.onrender.com](https://helpdesk-web-6ae7.onrender.com) (o primeiro acesso pode levar cerca de 1 minuto, porque a API gratuita dorme quando fica parada)
 
+**Contas de demonstração** (são públicas, não use dados reais nos chamados):
+
+| Perfil      | E-mail                        | Senha            |
+| ----------- | ----------------------------- | ---------------- |
+| Técnico     | `tecnico@tecnico.com`         | `tecnico123`     |
+| Solicitante | `solicitante@solicitante.com` | `solicitante123` |
+
+Também dá para criar a sua própria conta, que entra como solicitante.
+
 Interface web do sistema de chamados de TI, feita em **React e TypeScript**. Consome a
 [Help Desk API](https://github.com/thomaaasr/helpdesk-api), feita em Python com FastAPI.
 
