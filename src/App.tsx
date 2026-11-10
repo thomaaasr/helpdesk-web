@@ -42,6 +42,7 @@ function App() {
   const [erro, setErro] = useState<string | null>(null);
   const [status, setStatus] = useState<StatusChamado | "">("");
   const [numeroPagina, setNumeroPagina] = useState(1);
+  const [atrasados, setAtrasados] = useState(false);
   const [abrindoChamado, setAbrindoChamado] = useState(false);
   const [chamadoAberto, setChamadoAberto] = useState<number | null>(null);
   // Muda a cada alteração, para a lista buscar de novo.
@@ -66,6 +67,7 @@ function App() {
       buscarUsuarioLogado(token),
       listarChamados(token, {
         status: status || undefined,
+        atrasados,
         pagina: numeroPagina,
         limite: ITENS_POR_PAGINA,
       }),
@@ -89,7 +91,7 @@ function App() {
     return () => {
       cancelada = true;
     };
-  }, [token, status, numeroPagina, versaoLista]);
+  }, [token, status, atrasados, numeroPagina, versaoLista]);
 
   const totalPaginas = pagina
     ? Math.max(1, Math.ceil(pagina.total / pagina.limite))
@@ -112,9 +114,10 @@ function App() {
 
       {!token && <Login aoEntrar={trocarToken} />}
 
-      {token && chamadoAberto !== null && (
+      {token && usuario && chamadoAberto !== null && (
         <DetalheChamado
           token={token}
+          usuario={usuario}
           chamadoId={chamadoAberto}
           aoVoltar={() => {
             setChamadoAberto(null);
@@ -162,6 +165,17 @@ function App() {
               <option value="resolvido">Resolvido</option>
               <option value="fechado">Fechado</option>
             </select>
+            <label className="opcao">
+              <input
+                type="checkbox"
+                checked={atrasados}
+                onChange={(evento) => {
+                  setAtrasados(evento.target.checked);
+                  setNumeroPagina(1);
+                }}
+              />
+              Só atrasados
+            </label>
           </div>
 
           {erro && (
@@ -186,6 +200,7 @@ function App() {
                   <th>#</th>
                   <th>Título</th>
                   <th>Solicitante</th>
+                  <th>Técnico</th>
                   <th>Prioridade</th>
                   <th>Status</th>
                   <th>Prazo</th>
@@ -204,6 +219,7 @@ function App() {
                       </button>
                     </td>
                     <td>{chamado.solicitante.nome}</td>
+                    <td>{chamado.tecnico?.nome ?? "—"}</td>
                     <td>
                       <span className={`etiqueta ${chamado.prioridade}`}>
                         {NOMES_PRIORIDADE[chamado.prioridade]}

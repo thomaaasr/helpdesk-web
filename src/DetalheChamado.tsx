@@ -1,15 +1,28 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { buscarChamado, comentar, ErroApi, listarComentarios, type Chamado, type Comentario } from './api.ts';
+import {
+  assumirChamado,
+  buscarChamado,
+  comentar,
+  ErroApi,
+  listarComentarios,
+  mudarPrioridade,
+  mudarStatus,
+  type Chamado,
+  type Comentario,
+  type Prioridade,
+  type Usuario,
+} from './api.ts';
 import { formatarData, NOMES_PRIORIDADE, NOMES_STATUS } from './formatos.ts';
 
 type Props = {
   token: string;
+  usuario: Usuario;
   chamadoId: number;
   aoVoltar: () => void;
   aoExpirarLogin: () => void;
 };
 
-function DetalheChamado({ token, chamadoId, aoVoltar, aoExpirarLogin }: Props) {
+function DetalheChamado({ token, usuario, chamadoId, aoVoltar, aoExpirarLogin }: Props) {
   const [chamado, setChamado] = useState<Chamado | null>(null);
   const [comentarios, setComentarios] = useState<Comentario[]>([]);
   const [texto, setTexto] = useState('');
@@ -43,6 +56,19 @@ function DetalheChamado({ token, chamadoId, aoVoltar, aoExpirarLogin }: Props) {
     // tratarErro é recriada a cada renderização e não deve disparar uma nova busca.
     // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, [token, chamadoId, versao]);
+
+  // Executa uma ação do fluxo (assumir, resolver...) e mostra o chamado já atualizado.
+  async function executar(acao: () => Promise<Chamado>) {
+    setErro(null);
+    setEnviando(true);
+    try {
+      setChamado(await acao());
+    } catch (e) {
+      tratarErro(e as Error);
+    } finally {
+      setEnviando(false);
+    }
+  }
 
   async function enviarComentario(evento: FormEvent) {
     evento.preventDefault();
@@ -90,6 +116,8 @@ function DetalheChamado({ token, chamadoId, aoVoltar, aoExpirarLogin }: Props) {
             </dd>
           </dl>
 
+          <Acoes chamado={chamado} usuario={usuario} enviando={enviando} executar={executar} token={token} />
+
           <h3>Comentários</h3>
           {comentarios.length === 0 && <p className="dica">Nenhum comentário ainda.</p>}
           <ul className="comentarios">
@@ -124,6 +152,73 @@ function DetalheChamado({ token, chamadoId, aoVoltar, aoExpirarLogin }: Props) {
         </>
       )}
     </section>
+  );
+}
+
+type PropsAcoes = {
+  token: string;
+  chamado: Chamado;
+  usuario: Usuario;
+  enviando: boolean;
+  executar: (acao: () => Promise<Chamado>) => void;
+};
+
+// Mostra só os botões que a API permite para este usuário e este status.
+function Acoes({ token, chamado, usuario, enviando, executar }: PropsAcoes) {
+  const tecnico = usuario.perfil === 'tecnico';
+  const responsavel = chamado.tecnico?.id === usuario.id;
+  const dono = chamado.solicitante.id === usuario.id;
+
+  return (
+    <div className="acoes">
+      {tecnico && chamado.status === 'aberto' && (
+        <button
+          className="principal"
+          disabled={enviando}
+          onClick={() => executar(() => assumirChamado(token, chamado.id))}
+        >
+          Assumir chamado
+        </button>
+      )}
+      {responsavel && chamado.status === 'em_atendimento' && (
+        <button
+          className="principal"
+          disabled={enviando}
+          onClick={() => executar(() => mudarStatus(token, chamado.id, 'resolvido'))}
+        >
+          Marcar como resolvido
+        </button>
+      )}
+      {(tecnico || dono) && chamado.status === 'resolvido' && (
+        <>
+          <button
+            className="principal"
+            disabled={enviando}
+            onClick={() => executar(() => mudarStatus(token, chamado.id, 'fechado'))}
+          >
+            Fechar chamado
+          </button>
+          <button disabled={enviando} onClick={() => executar(() => mudarStatus(token, chamado.id, 'em_atendimento'))}>
+            Reabrir
+          </button>
+        </>
+      )}
+      {tecnico && chamado.status !== 'fechado' && (
+        <label>
+          Prioridade{' '}
+          <select
+            value={chamado.prioridade}
+            disabled={enviando}
+            onChange={(e) => executar(() => mudarPrioridade(token, chamado.id, e.target.value as Prioridade))}
+          >
+            <option value="baixa">Baixa (72h)</option>
+            <option value="media">Média (24h)</option>
+            <option value="alta">Alta (8h)</option>
+            <option value="critica">Crítica (4h)</option>
+          </select>
+        </label>
+      )}
+    </div>
   );
 }
 
