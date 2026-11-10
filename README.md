@@ -1,32 +1,44 @@
-# React + TypeScript + Vite
+# Help Desk Web
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+![CI](https://github.com/thomaaasr/helpdesk-web/actions/workflows/ci.yml/badge.svg)
 
-Currently, two official plugins are available:
+**Demo:** [helpdesk-web-6ae7.onrender.com](https://helpdesk-web-6ae7.onrender.com) (o primeiro acesso pode levar cerca de 1 minuto, porque a API gratuita dorme quando fica parada)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Interface web do sistema de chamados de TI, feita em **React e TypeScript**. Consome a
+[Help Desk API](https://github.com/thomaaasr/helpdesk-api), feita em Python com FastAPI.
 
-## React Compiler
+## O que dá para fazer
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Criar conta, entrar e sair (login com JWT, guardado no navegador)
+- **Solicitante:** abrir chamados, acompanhar o status e o prazo, comentar e fechar ou reabrir depois de resolvido
+- **Técnico:** ver todos os chamados, assumir, marcar como resolvido e alterar a prioridade
+- Lista com filtro por status, filtro de atrasados e paginação
+- Prazo de SLA destacado em vermelho quando passa da hora
 
-## Expanding the Oxlint configuration
+Os botões aparecem conforme o perfil e o status do chamado, seguindo as mesmas regras da API.
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+## Tecnologias
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+- **React 19**, **TypeScript** e **Vite**
+- **Vitest** e **Testing Library** (testes de componentes com a API simulada)
+- **oxlint** e **Prettier**
+- **GitHub Actions** (lint, formatação, testes e build a cada push) e deploy no **Render**
+
+## Rodando no seu computador
+
+Precisa da [Help Desk API](https://github.com/thomaaasr/helpdesk-api) rodando em `http://127.0.0.1:8000`.
+
+```bash
+npm install
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+O site abre em http://localhost:5173. Para usar outra API, defina a variável `VITE_API_URL`.
+
+## Testes e qualidade
+
+```bash
+npm test
+npm run lint
+npm run format:check
+```
